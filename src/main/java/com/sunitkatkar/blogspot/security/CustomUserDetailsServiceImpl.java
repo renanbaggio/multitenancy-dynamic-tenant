@@ -51,37 +51,31 @@ import com.sunitkatkar.blogspot.tenant.service.UserService;
 @Service("userDetailsService")
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Override
-    public UserDetails loadUserByUsernameAndTenantname(String username,
-            String tenant) throws UsernameNotFoundException {
-        if (StringUtils.isAnyBlank(username, tenant)) {
-            throw new UsernameNotFoundException(
-                    "Username and domain must be provided");
-        }
-        // Look for the user based on the username and tenant by accessing the
-        // UserRepository via the UserService
-        User user = userService.findByUsernameAndTenantname(username, tenant);
+	@Override
+	public UserDetails loadUserByUsernameAndTenantname(String username, String tenant) throws UsernameNotFoundException {
+		if (StringUtils.isAnyBlank(username, tenant)) {
+			throw new UsernameNotFoundException("Username and domain must be provided");
+		}
+		// Look for the user based on the username and tenant
+		// by accessing the UserRepository via the UserService
+		User user = userService.findByUsernameAndTenantname(username, tenant);
 
-        if (user == null) {
-            throw new UsernameNotFoundException(
-                    String.format(
-                            "Username not found for domain, "
-                                    + "username=%s, tenant=%s",
-                            username, tenant));
-        }
+		if (user == null) {
+			throw new UsernameNotFoundException(
+					String.format("Username not found for domain, " + "username=%s, tenant=%s", username, tenant));
+		}
 
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        for (Role role : user.getRoles()) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getRole()));
-        }
+		Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+		for (Role role : user.getRoles()) {
+			grantedAuthorities.add(new SimpleGrantedAuthority(role.getRole()));
+		}
 
-        CustomUserDetails customUserDetails = new CustomUserDetails(
-                user.getUsername(), user.getPassword(), grantedAuthorities,
-                tenant);
+		CustomUserDetails customUserDetails = new CustomUserDetails(user.getUsername(), user.getPassword(),
+				grantedAuthorities, tenant);
 
-        return customUserDetails;
-    }
+		return customUserDetails;
+	}
 }

@@ -14,7 +14,16 @@
     <div class="container">
       <div th:replace="index::logout"></div>
       <h3>This is a secured page for <span class="text-danger" th:text="${tenantName}">Some Domain</span> and username is <span class="text-success" th:text="${userName}">Username</span></h3>
-      <p><a href="/index" th:href="@{/index}">Back to home page</a></p>
+      <br>
+      Products:
+      <div style="width: 270px; border: 2px dashed #CCC; border-radius: 5px; padding: 8px 12px; margin: 10px 0;">
+      	<span th:utext="${products}">Products:</span>
+      </div>
+      <br>
+      <p>
+      	<a class="btn btn-sm btn-primary" href="/user/index" th:href="@{/user/index}">Reload this page</a>
+      	<a href="/index" th:href="@{/index}" style="margin-left: 10px;">Back to home page</a>
+      </p>
     </div>
 </body>
 </html>

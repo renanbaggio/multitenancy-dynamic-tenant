@@ -11,7 +11,7 @@ spring:
     show-sql: true 
     generate-ddl: false
     hibernate: 
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         show_sql: true
@@ -28,7 +28,7 @@ multitenancy:
         url: jdbc:mysql://localhost:3306/masterdb?useSSL=false
         username: root
         password: root
-        driverClassName: com.mysql.jdbc.Driver
+        driverClassName: com.mysql.cj.jdbc.Driver
         connectionTimeout: 20000
         maxPoolSize: 10
         idleTimeout: 300000

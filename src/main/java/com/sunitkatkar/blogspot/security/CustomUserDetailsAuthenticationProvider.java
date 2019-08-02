@@ -139,10 +139,8 @@ public class CustomUserDetailsAuthenticationProvider
                             auth.getPrincipal().toString(), auth.getTenant());
         } catch (UsernameNotFoundException notFound) {
             if (authentication.getCredentials() != null) {
-                String presentedPassword = authentication.getCredentials()
-                        .toString();
-                passwordEncoder.matches(presentedPassword,
-                        userNotFoundEncodedPassword);
+                String presentedPassword = authentication.getCredentials().toString();
+                passwordEncoder.matches(presentedPassword, userNotFoundEncodedPassword);
             }
             throw notFound;
         } catch (Exception repositoryProblem) {

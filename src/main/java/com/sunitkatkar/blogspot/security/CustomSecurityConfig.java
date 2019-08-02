@@ -43,83 +43,79 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class CustomSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+	@Autowired
+	private CustomUserDetailsService userDetailsService;
 
-    /**
-     * This is where access to various resources (urls) in the application is
-     * defined
-     */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        //@formatter:off
-        http
-            .addFilterBefore(authenticationFilter(), 
-                    UsernamePasswordAuthenticationFilter.class)
-            .authorizeRequests()
-                .antMatchers("/css/**", "/index").permitAll()
-                .antMatchers("/user/**").authenticated()
-            .and()
-            .formLogin().loginPage("/login")
-            .and()
-            .logout()
-            .logoutUrl("/logout");
-       //@formatter:on 
-    }
+	/**
+	 * This is where access to various resources (urls) in the application is
+	 * defined
+	 */
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+		.addFilterBefore(authenticationFilter(), 
+				UsernamePasswordAuthenticationFilter.class)
+		.authorizeRequests()
+			.antMatchers("/css/**", "/index").permitAll()
+			.antMatchers("/user/**").authenticated()
+		.and()
+		.formLogin().loginPage("/login")
+		.and()
+		.logout()
+		.logoutUrl("/logout");
+	}
 
-    /**
-     * Create an instance of the custom authentication filter which intercepts
-     * and processes the end user's login form submission for further
-     * authentication processing. This filter is added before other filters so
-     * that it can intercept the user login form submission and extract the the
-     * additional 'tenant' field
-     * 
-     * @return
-     * @throws Exception
-     */
-    public CustomAuthenticationFilter authenticationFilter() throws Exception {
-        CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
-        filter.setAuthenticationManager(authenticationManagerBean());
-        filter.setAuthenticationFailureHandler(failureHandler());
-        filter.setAuthenticationSuccessHandler(successHandler());
-        return filter;
-    }
+	/**
+	 * Create an instance of the custom authentication filter which intercepts and
+	 * processes the end user's login form submission for further authentication
+	 * processing. This filter is added before other filters so that it can
+	 * intercept the user login form submission and extract the the additional
+	 * 'tenant' field
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public CustomAuthenticationFilter authenticationFilter() throws Exception {
+		CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
+		filter.setAuthenticationManager(authenticationManagerBean());
+		filter.setAuthenticationFailureHandler(failureHandler());
+		filter.setAuthenticationSuccessHandler(successHandler());
+		return filter;
+	}
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth)
-            throws Exception {
-        auth.authenticationProvider(authProvider());
-    }
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		auth.authenticationProvider(authProvider());
+	}
 
-    /**
-     * Authentication provider which provides the logged in user's credentials
-     * for verification and authentication if they are coeect
-     * 
-     * @return
-     */
-    public AuthenticationProvider authProvider() {
-        // The custom authentication provider defined for this app
-        CustomUserDetailsAuthenticationProvider provider = new CustomUserDetailsAuthenticationProvider(
-                passwordEncoder(), userDetailsService);
-        return provider;
-    }
+	/**
+	 * Authentication provider which provides the logged in user's credentials for
+	 * verification and authentication if they are coeect
+	 * 
+	 * @return
+	 */
+	public AuthenticationProvider authProvider() {
+		// The custom authentication provider defined for this app
+		CustomUserDetailsAuthenticationProvider provider = new CustomUserDetailsAuthenticationProvider(
+				passwordEncoder(), userDetailsService);
+		return provider;
+	}
 
-    /**
-     * The page to show if authentication fails
-     * 
-     * @return
-     */
-    public SimpleUrlAuthenticationFailureHandler failureHandler() {
-        return new SimpleUrlAuthenticationFailureHandler("/login?error=true");
-    }
+	/**
+	 * The page to show if authentication fails
+	 * 
+	 * @return
+	 */
+	public SimpleUrlAuthenticationFailureHandler failureHandler() {
+		return new SimpleUrlAuthenticationFailureHandler("/login?error=true");
+	}
 
-    public SimpleUrlAuthenticationSuccessHandler successHandler() {
-        return new SimpleUrlAuthenticationSuccessHandler("/user/index");
-    }
+	public SimpleUrlAuthenticationSuccessHandler successHandler() {
+		return new SimpleUrlAuthenticationSuccessHandler("/user/index");
+	}
 
-    @Bean(name = "passwordEncoder")
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
+	@Bean(name = "passwordEncoder")
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

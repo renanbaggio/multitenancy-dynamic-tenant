@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -74,10 +75,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsernameAndTenantname(String username, String tenant) {
-        User user = userRepository.findByUsernameAndTenantname(username,
-                tenant);
-        LOG.info("Found user with username:" + user.getUsername()
-                + " from tenant:" + user.getTenant());
+        User user = userRepository.findByUsernameAndTenantname(username, tenant);
+        
+        if (user == null) {
+        	throw new UsernameNotFoundException("Usuário não encontrado");
+        }
+        LOG.info("Found user with username:" + user.getUsername() + " from tenant:" + user.getTenant());
         return user;
     }
 

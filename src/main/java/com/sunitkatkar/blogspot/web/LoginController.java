@@ -15,8 +15,10 @@
  */
 package com.sunitkatkar.blogspot.web;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,10 +27,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sunitkatkar.blogspot.tenant.model.CustomUserDetails;
+import com.sunitkatkar.blogspot.tenant.model.Product;
+import com.sunitkatkar.blogspot.tenant.service.ProductService;
  
 
 @Controller
 public class LoginController {
+	
+	@Autowired
+	private ProductService productService;
+
+	private List<Product> products;
 
     @RequestMapping("/")
     public String root() {
@@ -37,18 +46,21 @@ public class LoginController {
 
     @RequestMapping("/index")
     public String index(Model model) {
+    	loadProducts(model);
+    	
         getLoggedInUsername().ifPresent(f -> {
             model.addAttribute("userName", f);
         });
         getTenantName().ifPresent(d -> {
             model.addAttribute("tenantName", d);
         });
-
         return "index";
     }
 
     @RequestMapping("/user/index")
     public String userIndex(Model model) {
+    	loadProducts(model);
+    	
         getLoggedInUsername().ifPresent(f -> {
             model.addAttribute("userName", f);
         });
@@ -58,6 +70,18 @@ public class LoginController {
         return "user/index";
     }
 
+	private void loadProducts(Model model) {
+		products = productService.findAll();
+    	
+    	if (products != null && !products.isEmpty()) {
+    		StringBuilder builder = new StringBuilder();
+    		for (Product product : products) {
+    			builder.append(product.getName().concat("<br>"));
+    		}
+    		model.addAttribute("products", builder.toString());
+    	}
+	}
+
     @RequestMapping("/login")
     public String login() {
         return "login";
@@ -66,18 +90,19 @@ public class LoginController {
     private Optional<String> getLoggedInUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = null;
+        
         if (auth != null && !auth.getClass().equals(AnonymousAuthenticationToken.class)) {
             // User user = (User) auth.getPrincipal();
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
             userName = userDetails.getUsername();
         }
-
         return Optional.ofNullable(userName);
     }
 
     private Optional<String> getTenantName() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String tenantName = null;
+        
         if (auth != null && !auth.getClass().equals(AnonymousAuthenticationToken.class)) {
             // User user = (User) auth.getPrincipal();
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
